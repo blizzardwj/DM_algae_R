@@ -16,16 +16,19 @@ colum <- list('season','size','speed','mxPH','mnO2','Cl',
             'NO3','NH4','oPO4','PO4','Chla','a1','a2','a3','a4',
             'a5','a6','a7')
 ###################################################
-### Data Visualization and Summarization
+### Data Summarization
 ###################################################
 sink("Summary.txt")   #output into summary.txt
 summary(algae)
 sink()
 
+###################################################
+### Data Visualization
+###################################################
 library(car)
 for (i in 4:18) {
   a <- colum[[i]]
-  
+
   png(file=paste('Histogram of ',a,'.png') )
   #par(mfrow=c(1,2))
   hist(algae[,i], prob=T, xlab='',main=paste('Histogram of ',a))
@@ -35,8 +38,8 @@ for (i in 4:18) {
   png(file=paste('QQ of ',a,'.png') )
   qqPlot(algae[,i],main=paste('Normal QQ plot of ',a),ylab= as.character(a))
   dev.off( )
-  
-  
+
+
   png(file=paste('box of ',a,'.png') )
   #par(mfrow=c(1,1))
   boxplot(algae[,i],ylab= as.character(a))
@@ -61,7 +64,7 @@ for (i in 12:18) {
 }
 
 ###################################################
-### Unkwnon Values
+### Unkwnon Values Process
 ###################################################
 #algae <- algae[-manyNAs(algae),]
 ###0,orginal
@@ -84,10 +87,10 @@ for (i in 4:11) {
   a <- colum[[i]]
   as.numeric(names(table(algae[,as.character(a)])))[which.max(table(algae[,as.character(a)]))]
   algae[is.na(algae[,i]),as.character(a)] <- as.numeric(names(table(algae[,as.character(a)])))[which.max(table(algae[,as.character(a)]))]
-  
-  
+
+
 }
-write.csv(algae,file = "Analysis_Frequency.csv",na = "XXXXXXX") 
+write.csv(algae,file = "Analysis_Frequency.csv",na = "XXXXXXX")
 ###3,Correlation
 algae <- read.table('Analysis.txt',
                     header=F,
@@ -99,7 +102,7 @@ algae <- read.table('Analysis.txt',
 algae <- algae[-manyNAs(algae),]
 sink("CorrelationMatrix.txt")   #output into CorrelationMatrix.txt
 symnum(cor(algae[,4:18],use="complete.obs"))
-sink()  
+sink()
 
 sink("CorrelationCoefficient.txt")   #output into CorrelationCoefficient.txt
 lm(PO4 ~ oPO4,data=algae)
@@ -156,7 +159,7 @@ algae[is.na(algae$Cl),'Cl'] <- sapply(algae[is.na(algae$Cl),'oPO4'],fillCl)
 
 #algae[is.na(algae$mnO2),"mnO2"] <- mean(algae$mnO2,na.rm = T)
 
-write.csv(algae,file = "Analysis_Correlation.csv",na = "XXXXXXX") 
+write.csv(algae,file = "Analysis_Correlation.csv",na = "XXXXXXX")
 
 ###4,Similarity
 algae <- read.table('Analysis.txt',
@@ -167,4 +170,4 @@ algae <- read.table('Analysis.txt',
                                 'a5','a6','a7'),
                     na.strings=c('XXXXXXX'))
 algae <- knnImputation(algae,k=10)
-write.csv(algae,file = "Analysis_Similarity.csv",na = "XXXXXXX") 
+write.csv(algae,file = "Analysis_Similarity.csv",na = "XXXXXXX")
